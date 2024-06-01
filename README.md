@@ -5,7 +5,7 @@ Zelda 64: Recompiled is a project that uses [N64: Recompiled](https://github.com
 
 ### **This repository and its releases do not contain game assets. The original game is required to build or run this project.**
 
-## Table of Contents
+## Table of Contentsxx
 * [System Requirements](#system-requirements)
 * [Features](#features)
   * [Plug and Play](#plug-and-play)
