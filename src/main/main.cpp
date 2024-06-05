@@ -48,7 +48,11 @@ void exit_error(const char* str, Ts ...args) {
     // TODO pop up an error
     ((void)fprintf(stderr, str, args), ...);
     assert(false);
+#ifdef __APPLE__
+    std::_Exit(EXIT_FAILURE);
+#else
     std::quick_exit(EXIT_FAILURE);
+#endif
 }
 
 ultramodern::gfx_callbacks_t::gfx_data_t create_gfx() {
@@ -122,7 +126,12 @@ bool SetImageAsIcon(const char* filename, SDL_Window* window)
 SDL_Window* window;
 
 ultramodern::WindowHandle create_window(ultramodern::gfx_callbacks_t::gfx_data_t) {
-    window = SDL_CreateWindow("Zelda 64: Recompiled", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 960, SDL_WINDOW_RESIZABLE );
+    uint32_t window_flags = SDL_WINDOW_RESIZABLE;
+#ifdef __APPLE__
+    window_flags |= SDL_WINDOW_METAL;
+#endif
+
+    window = SDL_CreateWindow("Zelda 64: Recompiled", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 960, window_flags );
 #if defined(__linux__)
     SetImageAsIcon("icons/512.png",window);
     if (ultramodern::get_graphics_config().wm_option == ultramodern::WindowMode::Fullscreen) { // TODO: Remove once RT64 gets native fullscreen support on Linux
@@ -150,6 +159,9 @@ ultramodern::WindowHandle create_window(ultramodern::gfx_callbacks_t::gfx_data_t
     }
 
     return ultramodern::WindowHandle{ wmInfo.info.x11.display, wmInfo.info.x11.window };
+#elif defined(__APPLE__)
+    SDL_MetalView view = SDL_Metal_CreateView(window);
+    return ultramodern::WindowHandle{ wmInfo.info.cocoa.window, view };
 #else
     static_assert(false && "Unimplemented");
 #endif
